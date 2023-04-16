@@ -9,7 +9,7 @@ public class Proceso {
     int     tiempoLlegada;
     Proceso    siguienteProceso;
 
-    Proceso(int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada){
+    public Proceso(int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada){
         this.idProceso = idProceso;
         this.nombreProceso = nombreProceso;
         this.tamanioProceso = tamanioProceso;
