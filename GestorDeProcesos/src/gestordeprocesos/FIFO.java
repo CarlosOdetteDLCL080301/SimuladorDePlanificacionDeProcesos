@@ -51,19 +51,15 @@ public class FIFO {
         return nuevoArreglo;
     }
     
-    void modificarRafaga(int quamtum,int tiempo_ms){//el momento de ejecutar esta función, programa que la rafaga sea mayor a cero, si no, generaria un problema
+    void modificarRafaga(int tiempo_ms){//el momento de ejecutar esta función, programa que la rafaga sea mayor a cero, si no, generaria un problema
         //Primero se debe comprobar que existe la rafaga suficiente para decrementarla con él Quantum
-            if(frente.tamanioProceso >= quamtum){
-                frente.tamanioProceso -= quamtum;
-                almacenamientoDisponible += quamtum;
-            }else{//Esta condición en caso de que la rafaga restante sea menor al quantum que se desea restar, se hará 0
-                almacenamientoDisponible += frente.tamanioProceso;//Se le suma la rafaga restante al almacenamiento
-                frente.tamanioProceso = 0; //Y nuestra rafaga pasa automaticamente a cero.
-            }
+        if(frente.tamanioProceso>0){
+            almacenamientoDisponible ++;
+            frente.tamanioProceso--;
+        }
             frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, tiempo_ms);
         //En caso de que nuestra rafaga del proceso ya sea cero, no nos servirá de nada, así que procederá a ser eliminada, esta linea se conectará
         //con la parte del GestorDeProceso, donde si aun no es cero, lo que hará es encolar a la "listo" para que vuelva a pelear por el espacio
-        frente.inactivoPor--;
         if(frente.tamanioProceso == 0){
             
             //Tiempo de respuesta de un proceso:    Tiempo de respuesta = Tiempo de inicio de la ejecución - Tiempo de llegada
