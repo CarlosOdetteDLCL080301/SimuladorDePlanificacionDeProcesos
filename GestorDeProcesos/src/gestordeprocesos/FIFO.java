@@ -51,17 +51,20 @@ public class FIFO {
         return nuevoArreglo;
     }
     
-    void modificarRafaga(int tiempo_ms){//el momento de ejecutar esta función, programa que la rafaga sea mayor a cero, si no, generaria un problema
+    void modificarRafaga(int nuevoTiempo,int quantum,int tiempo_ms){//el momento de ejecutar esta función, programa que la rafaga sea mayor a cero, si no, generaria un problema
         //Primero se debe comprobar que existe la rafaga suficiente para decrementarla con él Quantum
-        if(frente.tamanioProceso>0){
-            almacenamientoDisponible ++;
-            frente.tamanioProceso--;
+        if(frente.tamanioProceso>quantum){
+            almacenamientoDisponible += frente.tamanioProceso - nuevoTiempo;
+            frente.tamanioProceso=nuevoTiempo;
+        }else{
+            almacenamientoDisponible += frente.tamanioProceso;
+            frente.tamanioProceso = 0;
         }
-            frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, tiempo_ms);
+            frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, nuevoTiempo);
         //En caso de que nuestra rafaga del proceso ya sea cero, no nos servirá de nada, así que procederá a ser eliminada, esta linea se conectará
         //con la parte del GestorDeProceso, donde si aun no es cero, lo que hará es encolar a la "listo" para que vuelva a pelear por el espacio
         if(frente.tamanioProceso == 0){
-            
+            System.out.println(frente.nombreProceso+"///Tiempos de que sube a CPU " + Arrays.toString(frente.vecesDeAcceso));
             //Tiempo de respuesta de un proceso:    Tiempo de respuesta = Tiempo de inicio de la ejecución - Tiempo de llegada
             sumatoriaDeRespuesta += (frente.vecesDeAcceso[1]-frente.tiempoLlegada);
             //Tiempo de ejecución de un proceso:    Tiempo de ejecución = Tiempo de finalización - Tiempo de llegada

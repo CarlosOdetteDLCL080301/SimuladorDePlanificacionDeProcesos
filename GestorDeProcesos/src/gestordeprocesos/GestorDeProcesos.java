@@ -87,8 +87,8 @@ public class GestorDeProcesos {
         //Aqui habrá una función para agregar los valores a nuestra cola
     recepcion.agregar(1,    "Proceso 1",   6,6,6,6,1,inicio);
     recepcion.agregar(2,    "Proceso 2",   18,18,18,6,4,inicio);
-    recepcion.agregar(6,    "Proceso 6",   12,12,12,12,6,inicio);
-    recepcion.agregar(7,    "Proceso 7",   17,12,12,17,7,inicio);
+    recepcion.agregar(3,    "Proceso 3",   12,12,12,12,6,inicio);
+    recepcion.agregar(4,    "Proceso 4",   17,17,17,17,7,inicio);
        n_elementos = gestor.contarElementosDeCola(recepcion);
        gestor.ordenarCola(recepcion);
        /*
@@ -119,46 +119,42 @@ public class GestorDeProcesos {
        Segun el tiempo[ms] que transcurra, este agregara la solicitud de
        de valores, conforme su tiempo de llegada previamente definido
        */       
-    int tiempo_ms=0,quantumDeseado = 4,quantum = quantumDeseado,repite = 0;
+    int tiempo_ms=0,quantumDeseado = 4,quantum = quantumDeseado,repite = 0, tiemposQueSube;
     Proceso acomodar;
     boolean continuar = true;
        do{
+           tiemposQueSube = tiempo_ms;
            System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms + "\nInactivo: " + repite);
            //Vamos a ingresar a la cola de ejecución respecto a su tiempo de llegada //NOTA PERSONAL: ADICIONAR QUE SE AGREGUE SI SU tiempo_ms==recepcion.eliminar().tiempoLlegada
-           if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada == tiempo_ms){//Mientras no este vacia
+           if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
                acomodar = recepcion.eliminar();
                continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
            }
-           
+           int t,resta;
            if(!cola_listoEjecucion.estaVacia()){//Si la cola de ejecución no esta vacía
+               t = cola_listoEjecucion.frente.tamanioProceso;
+               resta = t -quantum;
                System.out.println("------------> Ejecución <------------");
                cola_listoEjecucion.imprimir();
                System.out.println("------------> Listo <------------quamtum: " + quantum);
                cola_procesoListo.imprimir();
                
-               if(cola_listoEjecucion.frente.tamanioProceso < quantum)
-                   quantum = cola_listoEjecucion.frente.tamanioProceso;
-               
-               if(repite!=quantum && cola_listoEjecucion.frente.tamanioProceso>quantum){
-                    cola_listoEjecucion.modificarRafaga(tiempo_ms);
-                    repite++;
+               if(resta>0){
+                   tiempo_ms += quantum;
+                   cola_listoEjecucion.modificarRafaga(resta,quantum, tiemposQueSube);
+                   gestor.desplazarListas(cola_procesoListo, cola_listoEjecucion);
                }else{
-                   if(repite==quantum){
-                    gestor.desplazarListas(cola_listoEjecucion,cola_procesoListo);
-                    repite = 0;quantum = quantumDeseado;
-                   }
-                   cola_listoEjecucion.modificarRafaga(tiempo_ms);
-                   repite++;
-                   
+                    tiempo_ms += (quantum + resta);
+                    cola_listoEjecucion.modificarRafaga(0, quantum, tiempo_ms);
                }
-               
-               
-                
+               gestor.desplazarListas(cola_listoEjecucion, cola_procesoListo);
                //Si la cola "ejecución" tiene espacio suficiente, permite añadir el siguiente elemento formado en la cola "listo",
                //realizaremos un desplazamiento del frente de "listo" a la cola de "ejecución"
                
-           }   
-           tiempo_ms++;
+           }else{
+                tiempo_ms++;       
+                }   
+           //tiempo_ms++;
        }while((!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia())) && tiempo_ms<55);
        
         System.out.println("Tiempo de respuesta promedio: " + (cola_listoEjecucion.sumatoriaDeRespuesta/n_elementos));
