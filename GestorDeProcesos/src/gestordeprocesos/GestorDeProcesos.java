@@ -3,20 +3,14 @@ import java.util.Scanner;
    
 public class GestorDeProcesos {
     
-    boolean agregarAColaRespectiva(FIFO cola_listoEjecucion, FIFO cola_procesoListo,boolean listoEjecucionDisponible, int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada){
+    boolean agregarAColaRespectiva(FIFO cola_listoEjecucion, FIFO cola_procesoListo,boolean listoEjecucionDisponible, int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada,int[] vecesDeAcceso){
         if(cola_listoEjecucion.almacenamientoDisponible - tamanioProceso >= 0 && listoEjecucionDisponible){
-            cola_listoEjecucion.agregar(idProceso, nombreProceso, tamanioProceso, tiempoEjecución, prioridadProceso, tiempoOperacionES, tiempoLlegada);
+            cola_listoEjecucion.agregar(idProceso, nombreProceso, tamanioProceso, tiempoEjecución, prioridadProceso, tiempoOperacionES, tiempoLlegada, vecesDeAcceso);
             return listoEjecucionDisponible;
         }else{
-            cola_procesoListo.agregar(idProceso, nombreProceso, tamanioProceso, tiempoEjecución, prioridadProceso, tiempoOperacionES, tiempoLlegada);
+            cola_procesoListo.agregar(idProceso, nombreProceso, tamanioProceso, tiempoEjecución, prioridadProceso, tiempoOperacionES, tiempoLlegada, vecesDeAcceso);
             return listoEjecucionDisponible = false;
         }
-    }
-    
-    void mandarAFormar(FIFO listo, FIFO ejecucion){
-        Proceso temporal;
-        temporal = ejecucion.eliminar();
-        listo.agregar(temporal.idProceso, temporal.nombreProceso, temporal.tamanioProceso, temporal.tiempoEjecución, temporal.prioridadProceso, temporal.tiempoOperacionES, temporal.tiempoLlegada);
     }
     
     int contarElementosDeCola(FIFO cola){
@@ -25,12 +19,12 @@ public class GestorDeProcesos {
         FIFO auxiliar = new FIFO(cola.almacenamientoDisponible);
         while(!cola.estaVacia()){
             elemento = cola.eliminar();
-            auxiliar.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada);
+            auxiliar.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada, elemento.vecesDeAcceso);
             contador++;
         }
         while(!auxiliar.estaVacia()){
             elemento = auxiliar.eliminar();
-            cola.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada);
+            cola.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada, elemento.vecesDeAcceso);
         }
         return contador;
     }
@@ -63,30 +57,41 @@ public class GestorDeProcesos {
         
         //Llenar la cola con los elementos ordenados
         for(int j = 0;j<n;j++)
-            cola.agregar(array[j].idProceso, array[j].nombreProceso, array[j].tamanioProceso, array[j].tiempoEjecución, array[j].prioridadProceso, array[j].tiempoOperacionES, array[j].tiempoLlegada);
+            cola.agregar(array[j].idProceso, array[j].nombreProceso, array[j].tamanioProceso, array[j].tiempoEjecución, array[j].prioridadProceso, array[j].tiempoOperacionES, array[j].tiempoLlegada,array[j].vecesDeAcceso);
         
         //cola.almacenamientoDisponible = alm;
     }
     
+    void desplazarListas(FIFO destino, FIFO emisor){
+        Proceso desplazar;
+        if(!emisor.estaVacia() && (destino.almacenamientoDisponible - emisor.frente.tamanioProceso >=0 )){
+            desplazar = emisor.eliminar();
+            destino.agregar(desplazar.idProceso, desplazar.nombreProceso, desplazar.tamanioProceso, desplazar.tiempoEjecución, desplazar.prioridadProceso, desplazar.tiempoOperacionES, desplazar.tiempoLlegada, desplazar.vecesDeAcceso);
+        }
+    }
+    
     public static void main(String[] args) {
+        //Variables para calcular los tiempos respectivos
+            int n_elementos;
         Scanner scanner = new Scanner(System.in);  // Crear un objeto de la clase Scanner
-        int almacenamiento = 20;
+        int almacenamiento = 16;
         FIFO cola_listoEjecucion = new FIFO(almacenamiento);
-        FIFO cola_procesoListo = new FIFO(120);
+        FIFO cola_procesoListo = new FIFO(1024);
         FIFO recepcion = new FIFO(almacenamiento);
         int procesoIngresar;
         String pregCont, teclado_nombreProceso;
         int teclado_idProceso, teclado_tamanioProceso, teclado_tiempoEjecución, teclado_prioridadProceso, teclado_tiempoOperacionES, teclado_tiempoLlegada;
         boolean listoEjecucionDisponible = true, continuamos;
         GestorDeProcesos gestor = new GestorDeProcesos();
+        int[] inicio = {0};
         //Aqui habrá una función para agregar los valores a nuestra cola
-       recepcion.agregar(10,"Proceso 10", 10,10,10,10,10);
-       recepcion.agregar(9,"Proceso 9", 9,9,9,9,9);
-       recepcion.agregar(8,"Proceso 8", 8,8,8,8,8);
-       recepcion.agregar(7,"Proceso 7", 7,7,7,7,7);
-       recepcion.imprimir();
+       recepcion.agregar(5,    "Proceso 5",   5,5,5,5,0,inicio);
+       recepcion.agregar(4,    "Proceso 4",   4,4,4,4,1,inicio);
+       recepcion.agregar(2,     "Proceso 2",    2,2,2,      2,2,inicio);
+       recepcion.agregar(1,     "Proceso 1",    1,  1,1,1,3,inicio);
+       recepcion.agregar(6,     "Proceso 6",    6,  6,6,6,4,inicio);
+       n_elementos = gestor.contarElementosDeCola(recepcion);
        gestor.ordenarCola(recepcion);
-       recepcion.imprimir();
        /*
         System.out.println("Ingresa cuantos valores ingresarás");
         procesoIngresar = scanner.nextInt();
@@ -114,8 +119,41 @@ public class GestorDeProcesos {
        /*
        Segun el tiempo[ms] que transcurra, este agregara la solicitud de
        de valores, conforme su tiempo de llegada previamente definido
-       */
+       */       
+    int tiempo_ms=0,quantum = 3;
+    Proceso acomodar;
+    boolean continuar = true;
+       do{
+           System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms);
+           //Vamos a ingresar a la cola de ejecución respecto a su tiempo de llegada //NOTA PERSONAL: ADICIONAR QUE SE AGREGUE SI SU tiempo_ms==recepcion.eliminar().tiempoLlegada
+           if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada == tiempo_ms){//Mientras no este vacia
+               acomodar = recepcion.eliminar();
+               continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
+           }
+           
+           if(!cola_listoEjecucion.estaVacia()){//Si la cola de ejecución no esta vacía
+               System.out.println("------------> Ejecución <------------");
+               cola_listoEjecucion.imprimir();
+               System.out.println("------------> Listo <------------");
+               cola_procesoListo.imprimir();;
+               if(cola_listoEjecucion.frente.tamanioProceso!=0){
+                    cola_listoEjecucion.modificarRafaga(quantum,tiempo_ms);
+                    gestor.desplazarListas(cola_procesoListo, cola_listoEjecucion);
+               }
+               //Si la cola "ejecución" tiene espacio suficiente, permite añadir el siguiente elemento formado en la cola "listo",
+               //realizaremos un desplazamiento del frente de "listo" a la cola de "ejecución"
+               gestor.desplazarListas(cola_listoEjecucion,cola_procesoListo);
+           }   
+           tiempo_ms++;
+       }while(!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia()));
        
+        System.out.println("Tiempo de respuesta promedio: " + (cola_listoEjecucion.sumatoriaDeRespuesta/n_elementos));
+        System.out.println("Tiempo de ejecución promedio: " + (cola_listoEjecucion.sumatoriaDeEjecución/n_elementos));
+        System.out.println("Tiempo de espera promedio: " + (cola_listoEjecucion.sumatoriaDeEspera/n_elementos));
+        System.out.println("gestordeprocesos.GestorDeProcesos.main() " + n_elementos);
     }
+    
+    //Procederemos a calcular  los tiempos promedio con los valores que obtuvimos 
+    
     
 }
