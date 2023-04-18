@@ -126,10 +126,7 @@ public class GestorDeProcesos {
            tiemposQueSube = tiempo_ms;
            System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms + "\nInactivo: " + repite);
            //Vamos a ingresar a la cola de ejecución respecto a su tiempo de llegada //NOTA PERSONAL: ADICIONAR QUE SE AGREGUE SI SU tiempo_ms==recepcion.eliminar().tiempoLlegada
-           if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
-               acomodar = recepcion.eliminar();
-               continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
-           }
+           
            int t,resta;
            if(!cola_listoEjecucion.estaVacia()){//Si la cola de ejecución no esta vacía
                t = cola_listoEjecucion.frente.tamanioProceso;
@@ -143,24 +140,34 @@ public class GestorDeProcesos {
                    tiempo_ms += quantum;
                    cola_listoEjecucion.modificarRafaga(resta,quantum, tiemposQueSube);
                    gestor.desplazarListas(cola_procesoListo, cola_listoEjecucion);
+                   while(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
+                    acomodar = recepcion.eliminar();
+                    continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
+                     }
                }else{
                     tiempo_ms += (quantum + resta);
-                    cola_listoEjecucion.modificarRafaga(0, quantum, tiempo_ms);
+                    cola_listoEjecucion.modificarRafaga(0, quantum, tiemposQueSube);
                }
                gestor.desplazarListas(cola_listoEjecucion, cola_procesoListo);
                //Si la cola "ejecución" tiene espacio suficiente, permite añadir el siguiente elemento formado en la cola "listo",
                //realizaremos un desplazamiento del frente de "listo" a la cola de "ejecución"
-               
+               while(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
+               acomodar = recepcion.eliminar();
+               continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
+                }
            }else{
-                tiempo_ms++;       
+                tiempo_ms++;
+                if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
+               acomodar = recepcion.eliminar();
+               continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
+           }
                 }   
            //tiempo_ms++;
        }while((!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia())) && tiempo_ms<55);
        
-        System.out.println("Tiempo de respuesta promedio: " + (cola_listoEjecucion.sumatoriaDeRespuesta/n_elementos));
-        System.out.println("Tiempo de ejecución promedio: " + (cola_listoEjecucion.sumatoriaDeEjecución/n_elementos));
+        System.out.println("Tiempo de respuesta promedio: " + (cola_listoEjecucion.sumatoriaDeRespuesta/n_elementos));//LISTO!!!
+        System.out.println("Tiempo de ejecución promedio: " + (cola_listoEjecucion.sumatoriaDeEjecución/n_elementos));//LISTO!!!
         System.out.println("Tiempo de espera promedio: " + (cola_listoEjecucion.sumatoriaDeEspera/n_elementos));
-        System.out.println("gestordeprocesos.GestorDeProcesos.main() " + n_elementos);
     }
     
     //Procederemos a calcular  los tiempos promedio con los valores que obtuvimos 

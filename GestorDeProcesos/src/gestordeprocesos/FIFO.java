@@ -6,7 +6,7 @@ public class FIFO {
     
     Proceso frente;
     Proceso fin;
-    int sumatoriaDeEspera = 0, sumatoriaDeEjecución = 0, sumatoriaDeRespuesta = 0;
+    float sumatoriaDeEspera = 0, sumatoriaDeEjecución = 0, sumatoriaDeRespuesta = 0;
     int almacenamientoDisponible;
     
     FIFO(int almacenamientoDisponible) {
@@ -53,24 +53,28 @@ public class FIFO {
     
     void modificarRafaga(int nuevoTiempo,int quantum,int tiempo_ms){//el momento de ejecutar esta función, programa que la rafaga sea mayor a cero, si no, generaria un problema
         //Primero se debe comprobar que existe la rafaga suficiente para decrementarla con él Quantum
+        int adicionar = 0;
         if(frente.tamanioProceso>quantum){
             almacenamientoDisponible += frente.tamanioProceso - nuevoTiempo;
             frente.tamanioProceso=nuevoTiempo;
         }else{
+            
             almacenamientoDisponible += frente.tamanioProceso;
+            adicionar += frente.tamanioProceso;
             frente.tamanioProceso = 0;
         }
-            frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, nuevoTiempo);
+            frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, tiempo_ms);
         //En caso de que nuestra rafaga del proceso ya sea cero, no nos servirá de nada, así que procederá a ser eliminada, esta linea se conectará
         //con la parte del GestorDeProceso, donde si aun no es cero, lo que hará es encolar a la "listo" para que vuelva a pelear por el espacio
         if(frente.tamanioProceso == 0){
-            System.out.println(frente.nombreProceso+"///Tiempos de que sube a CPU " + Arrays.toString(frente.vecesDeAcceso));
+            System.out.println("\033[0;35m" + frente.nombreProceso+"///Tiempos de que sube a CPU " + Arrays.toString(frente.vecesDeAcceso) + "\033[0m");
             //Tiempo de respuesta de un proceso:    Tiempo de respuesta = Tiempo de inicio de la ejecución - Tiempo de llegada
             sumatoriaDeRespuesta += (frente.vecesDeAcceso[1]-frente.tiempoLlegada);
+            System.out.println("\033[0;31m" + (tiempo_ms + adicionar) + "\033[0m");
             //Tiempo de ejecución de un proceso:    Tiempo de ejecución = Tiempo de finalización - Tiempo de llegada
-            sumatoriaDeEjecución += (tiempo_ms - frente.tiempoLlegada);
+            sumatoriaDeEjecución += ((tiempo_ms + adicionar) - frente.tiempoLlegada);
             //Tiempo de espera de un proceso:       Tiempo de espera = Tiempo de finalización - Tiempo de llegada - Tiempo de ejecución
-            sumatoriaDeEspera += (sumatoriaDeEjecución - frente.tiempoLlegada - sumatoriaDeRespuesta);
+            sumatoriaDeEspera += ((tiempo_ms + adicionar) - frente.tiempoLlegada - frente.tiempoEjecución);
             eliminar();
         }
         
