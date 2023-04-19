@@ -1,15 +1,16 @@
 package gestordeprocesos;
+
 public class Proceso {
-    int     idProceso;
-    String  nombreProceso;
-    int     tamanioProceso;
+    int     idProceso;//
+    String  nombreProceso;//"Word"
+    int     tamanioProceso;//
     int     tiempoEjecución;
     int     prioridadProceso;
     int     tiempoOperacionES;
     int     tiempoLlegada;
-    Proceso siguienteProceso;
-    int     inactivoPor;
-    int[] vecesDeAcceso;
+    Proceso siguienteProceso;//
+    int     inactivoPor;//Round Robin
+    int[] vecesDeAcceso;//Guardar registro de las veces que sube a CPU
 
     public Proceso(int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada,int[] vecesDeAcceso){
         this.idProceso = idProceso;

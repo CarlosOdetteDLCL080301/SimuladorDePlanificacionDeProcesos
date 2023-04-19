@@ -2,7 +2,10 @@ package gestordeprocesos;
 import java.util.Scanner;
    
 public class GestorDeProcesos {
-    
+    /*
+    El siguiente metodo, tiene como proposito, agregar principalmente en la cola de ejecución, en caso de que este
+    se encuentre lleno por el almacenamiento, tiene como proposito, mandarlo directamente a la cola de "listo"
+    */
     boolean agregarAColaRespectiva(FIFO cola_listoEjecucion, FIFO cola_procesoListo,boolean listoEjecucionDisponible, int idProceso, String nombreProceso,int tamanioProceso,int tiempoEjecución, int prioridadProceso, int tiempoOperacionES, int tiempoLlegada,int[] vecesDeAcceso){
         if(cola_listoEjecucion.almacenamientoDisponible - tamanioProceso >= 0 && listoEjecucionDisponible){
             cola_listoEjecucion.agregar(idProceso, nombreProceso, tamanioProceso, tiempoEjecución, prioridadProceso, tiempoOperacionES, tiempoLlegada, vecesDeAcceso);
@@ -12,35 +15,49 @@ public class GestorDeProcesos {
             return listoEjecucionDisponible = false;
         }
     }
-    
+    /*
+    Se desarrolló un metodo en el que pudiera replicar la función de "len()" como en otros lenguajes como Python
+    El cual su proposito es darnos la longitud de una cola, sin necesidad de pedirlo desde un inicio
+    */
     int contarElementosDeCola(FIFO cola){
         int contador = 0;
         Proceso elemento;
+        //Crea una copia de nuestro cola, 
         FIFO auxiliar = new FIFO(cola.almacenamientoDisponible);
-        while(!cola.estaVacia()){
+        while(!cola.estaVacia()){//Repetira hasta que la cola este vacia
             elemento = cola.eliminar();
             auxiliar.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada, elemento.vecesDeAcceso);
-            contador++;
+            contador++;//Se realiza el conteo, de cada elemento eliminado
         }
-        while(!auxiliar.estaVacia()){
+        while(!auxiliar.estaVacia()){//Se repetira hasta que la cola clon se vacie, pero regresando todos los valores como estaban al inicio
             elemento = auxiliar.eliminar();
             cola.agregar(elemento.idProceso, elemento.nombreProceso, elemento.tamanioProceso, elemento.tiempoEjecución, elemento.prioridadProceso, elemento.tiempoOperacionES, elemento.tiempoLlegada, elemento.vecesDeAcceso);
         }
-        return contador;
+        return contador;//Retornara, la cantidad de elementos que encontro nuestra función
     }
     
+    /*
+    Se crea una función en la cual, nos regresará nuestra cola que se ingreso, pero ordenada, tomando como referencia
+    el tiempo de llegada
+    */
     void ordenarCola(FIFO cola){
         int n = contarElementosDeCola(cola),i=0;
         Proceso[] array = new Proceso[n];
+        /*
+        Se usa un arreglo, pero unicamente para facilitar el ordenamiento de nuestra cola de entrada, pero esto no
+        choca con las condiciones que se nos pidio en el documento y menos con los que se nos ccomento durante la
+        sesion del dia 11 de abril
+        */
         Proceso elemento;
         //Vaciar la cola y almacenar sus elementos en el arreglo
-        while(!cola.estaVacia()){
+        while(!cola.estaVacia()){//Se vaciara todo la cola en un arreglo
             elemento = cola.eliminar();
             array[i] = elemento;
             i++;
         }
         
         //Aplicar el algoritmo de ordenamiento de seleccion al arreglo
+        //El algoritmo que escogimos, fue Bubble Sort
         for(int j=0;j<n-1;j++){
             int minimo = j;
             for(int k = j + 1; k < n; k++){
@@ -61,7 +78,11 @@ public class GestorDeProcesos {
         
         //cola.almacenamientoDisponible = alm;
     }
-    
+    /*
+    La siguiente función, tiene como proposito, lograr mover el proceso que se encuentra al inicio de nuestra
+    cola que consideremos como emisor, y la enviaremos a una cola destinatario. al igual, se considerará recuperar
+    toda la información de nuestro proceso, sin generar la perdida de alguno de ellos
+    */
     void desplazarListas(FIFO destino, FIFO emisor){
         Proceso desplazar;
         if(!emisor.estaVacia() && (destino.almacenamientoDisponible - emisor.frente.tamanioProceso >=0 )){
@@ -84,13 +105,21 @@ public class GestorDeProcesos {
         boolean listoEjecucionDisponible = true, continuamos;
         GestorDeProcesos gestor = new GestorDeProcesos();
         int[] inicio = {0};
-        //Aqui habrá una función para agregar los valores a nuestra cola
+        /*
+        Para facilitarnos el desarrollo del programa, decidimos mandarlos directamente, sin necesidad de pedirselo
+        al usuario (por ahora), para  hacer más rapido las pruebas, el caso que nosotros utilizamos como referencia, es el
+        ejercicio que se realizo un dia antes del examen sobre Round Robin
+        */
     recepcion.agregar(1,    "Proceso 1",   6,6,6,6,1,inicio);
     recepcion.agregar(2,    "Proceso 2",   18,18,18,6,4,inicio);
     recepcion.agregar(3,    "Proceso 3",   12,12,12,12,6,inicio);
     recepcion.agregar(4,    "Proceso 4",   17,17,17,17,7,inicio);
-       n_elementos = gestor.contarElementosDeCola(recepcion);
-       gestor.ordenarCola(recepcion);
+       n_elementos = gestor.contarElementosDeCola(recepcion);//Almacenamos los elementos que tiene nuestra cola
+       gestor.ordenarCola(recepcion);//Ordenamos la cola
+       /*
+       En caso de querer, que nuestro usuario tiene la intencion de ingresar los valores manualmente, solo se requiere desactivar
+       las siguientes lineas del codigo que tiene como proposito recopilar todos los propositos deseados
+       */
        /*
         System.out.println("Ingresa cuantos valores ingresarás");
         procesoIngresar = scanner.nextInt();
@@ -122,9 +151,10 @@ public class GestorDeProcesos {
     int tiempo_ms=0,quantumDeseado = 4,quantum = quantumDeseado,repite = 0, tiemposQueSube;
     Proceso acomodar;
     boolean continuar = true;
-       do{
+    //Al menos siempre se ejecutará una vez, por eso se consideró usar un Do - While   
+    do{
            tiemposQueSube = tiempo_ms;
-           System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms + "\nInactivo: " + repite);
+           System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms );
            //Vamos a ingresar a la cola de ejecución respecto a su tiempo de llegada //NOTA PERSONAL: ADICIONAR QUE SE AGREGUE SI SU tiempo_ms==recepcion.eliminar().tiempoLlegada
            
            int t,resta;
@@ -156,21 +186,33 @@ public class GestorDeProcesos {
                continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
                 }
            }else{
-                tiempo_ms++;
+                tiempo_ms++;/*En caso de que no se realice una operación con el Quantum, igual se hará el incremento para que se simule el tiempo
+                en cuestion de progreso
+                */
+                /*
+                Siempre se preguntará si el hay algun Proceso, pendiente por ingresar, en caso de que sí, se añadirá a nuestra cola de ejecucion
+                para que sea procesada
+                */
                 if(!recepcion.estaVacia() && recepcion.frente.tiempoLlegada <= tiempo_ms){//Mientras no este vacia
                acomodar = recepcion.eliminar();
                continuar = gestor.agregarAColaRespectiva(cola_listoEjecucion,cola_procesoListo,continuar,acomodar.idProceso, acomodar.nombreProceso, acomodar.tamanioProceso, acomodar.tiempoEjecución, acomodar.prioridadProceso, acomodar.tiempoOperacionES, acomodar.tiempoLlegada, acomodar.vecesDeAcceso);
            }
                 }   
            //tiempo_ms++;
-       }while((!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia())) && tiempo_ms<55);
-       
+    /*
+        El ciclo terminará cuando nuestras tres colas esten totalmente vacia, ya que significa que ya habremos finalizado
+           todas las operaciones necesarias para la actividad
+    */   
+    }while((!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia())));
+   /*
+    Siempre que existía una interacción directa con nuestro proceso, de nuestra cola de ejecución, siempre se
+    rescataba, el tiempo en que llegaba y se iba, pero el momento mas importante, es cuando realizabamos la suma
+    acumulativa para obtener las respectivos tiempos promedios de respuesta, ejecución y espera, unicamente aqui
+    esa suma acumulada será dividida por todos los elementos ingresados, para obtener el promedio
+    */
         System.out.println("Tiempo de respuesta promedio: " + (cola_listoEjecucion.sumatoriaDeRespuesta/n_elementos));//LISTO!!!
         System.out.println("Tiempo de ejecución promedio: " + (cola_listoEjecucion.sumatoriaDeEjecución/n_elementos));//LISTO!!!
         System.out.println("Tiempo de espera promedio: " + (cola_listoEjecucion.sumatoriaDeEspera/n_elementos));
     }
-    
-    //Procederemos a calcular  los tiempos promedio con los valores que obtuvimos 
-    
-    
+
 }
