@@ -5,6 +5,7 @@ public class Proceso {
     String  nombreProceso;//"Word"
     int     tamanioProceso;//
     int     tiempoEjecución;
+    int     tiempoEjecución_clon;
     int     prioridadProceso;
     int     tiempoOperacionES;
     int     tiempoLlegada;
@@ -22,5 +23,6 @@ public class Proceso {
         this.tiempoLlegada = tiempoLlegada;
         this.siguienteProceso = null;
         this.vecesDeAcceso = vecesDeAcceso;
+        this.tiempoEjecución_clon = this.tiempoEjecución;
     }
 }

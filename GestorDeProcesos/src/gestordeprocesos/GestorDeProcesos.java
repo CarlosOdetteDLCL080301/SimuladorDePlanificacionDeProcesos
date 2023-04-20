@@ -154,16 +154,17 @@ public class GestorDeProcesos {
     //Al menos siempre se ejecutará una vez, por eso se consideró usar un Do - While   
     do{
            tiemposQueSube = tiempo_ms;
-           System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms );
+           System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms + "\nQuantum: "+ quantum);
            //Vamos a ingresar a la cola de ejecución respecto a su tiempo de llegada //NOTA PERSONAL: ADICIONAR QUE SE AGREGUE SI SU tiempo_ms==recepcion.eliminar().tiempoLlegada
            
            int t,resta;
            if(!cola_listoEjecucion.estaVacia()){//Si la cola de ejecución no esta vacía
-               t = cola_listoEjecucion.frente.tamanioProceso;
+               //t = cola_listoEjecucion.frente.tamanioProceso;
+               t = cola_listoEjecucion.frente.tiempoEjecución;
                resta = t -quantum;
                System.out.println("------------> Ejecución <------------");
                cola_listoEjecucion.imprimir();
-               System.out.println("------------> Listo <------------quamtum: " + quantum);
+               System.out.println("------------> Listo <------------");
                cola_procesoListo.imprimir();
                
                if(resta>0){
@@ -204,7 +205,16 @@ public class GestorDeProcesos {
            todas las operaciones necesarias para la actividad
     */   
     }while((!recepcion.estaVacia() || (!cola_procesoListo.estaVacia() || !cola_listoEjecucion.estaVacia())));
-   /*
+    
+    //Realizamos una ultima impresion, para visualizar como quedo todos los registros en la memoria,  y en la cola de procesos
+    //Esto se debe porque, nuestro programa rompe el while cuando nota que ya no hay nada en las colas, pero imprime el ultimo caso
+    System.out.println("*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\nTiempo ms: " + tiempo_ms + "\nQuantum: "+ quantum);
+    System.out.println("------------> Ejecución <------------");
+    cola_listoEjecucion.imprimir();
+    System.out.println("------------> Listo <------------");
+    cola_procesoListo.imprimir();
+    
+    /*
     Siempre que existía una interacción directa con nuestro proceso, de nuestra cola de ejecución, siempre se
     rescataba, el tiempo en que llegaba y se iba, pero el momento mas importante, es cuando realizabamos la suma
     acumulativa para obtener las respectivos tiempos promedios de respuesta, ejecución y espera, unicamente aqui

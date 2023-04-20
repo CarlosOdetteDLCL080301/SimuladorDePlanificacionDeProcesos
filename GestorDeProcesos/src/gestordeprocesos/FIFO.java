@@ -73,17 +73,17 @@ public class FIFO {
     void modificarRafaga(int nuevoTiempo,int quantum,int tiempo_ms){
         int adicionar = 0;
         /*En caso de que el quantum sea menor a la rafaga, modificará la rafaga, con la afectación del quamtum y liberará parte de la rafaga*/
-        if(frente.tamanioProceso>quantum){
-            almacenamientoDisponible += frente.tamanioProceso - nuevoTiempo;
-            frente.tamanioProceso=nuevoTiempo;
+        if(frente.tiempoEjecución>quantum){
+            //almacenamientoDisponible += frente.tamanioProceso - nuevoTiempo;
+            frente.tiempoEjecución=nuevoTiempo;
         }else{
             /*
                 En caso de que la rafaga sea menor que el Quantum, automaticamente la siguiente vez, lo hará cero
                 y retomaremos la memoria que nos quedaba en uso 
             */
-            almacenamientoDisponible += frente.tamanioProceso;
-            adicionar += frente.tamanioProceso;
-            frente.tamanioProceso = 0;
+            //almacenamientoDisponible += frente.tamanioProceso;
+            adicionar += frente.tiempoEjecución;
+            frente.tiempoEjecución = 0;
         }
         /*
             posteriormente, mandaremos nuestro proceso afectado por el Quantum a la cola de listo
@@ -91,14 +91,14 @@ public class FIFO {
             frente.vecesDeAcceso = agregarElemento(frente.vecesDeAcceso, tiempo_ms);
         //En caso de que nuestra rafaga del proceso ya sea cero, no nos servirá de nada, así que procederá a ser eliminada, esta linea se conectará
         //con la parte del GestorDeProceso, donde si aun no es cero, lo que hará es encolar a la "listo" para que vuelva a pelear por el espacio
-        if(frente.tamanioProceso == 0){
+        if(frente.tiempoEjecución == 0){
             System.out.println("\033[0;35m" + frente.nombreProceso+"///Tiempos de que subio a CPU" + Arrays.toString(frente.vecesDeAcceso) + "\033[0m");
             //Tiempo de respuesta de un proceso:    Tiempo de respuesta = Tiempo de inicio de la ejecución - Tiempo de llegada
             sumatoriaDeRespuesta += (frente.vecesDeAcceso[1]-frente.tiempoLlegada);
             //Tiempo de ejecución de un proceso:    Tiempo de ejecución = Tiempo de finalización - Tiempo de llegada
             sumatoriaDeEjecución += ((tiempo_ms + adicionar) - frente.tiempoLlegada);
             //Tiempo de espera de un proceso:       Tiempo de espera = Tiempo de finalización - Tiempo de llegada - Tiempo de ejecución
-            sumatoriaDeEspera += ((tiempo_ms + adicionar) - frente.tiempoLlegada - frente.tiempoEjecución);
+            sumatoriaDeEspera += ((tiempo_ms + adicionar) - frente.tiempoLlegada - frente.tiempoEjecución_clon);
             eliminar();
         }
         
@@ -113,7 +113,7 @@ public class FIFO {
     void imprimir() {
         Proceso actual = frente;
         while (actual != null) {
-            System.out.print("ID: " + actual.idProceso + "\tRafaga: " + actual.tamanioProceso + "\n");
+            System.out.print("ID: " + actual.idProceso + "\tRafaga: " + actual.tiempoEjecución + "\n");
             actual = actual.siguienteProceso;
         }
         System.out.println("Almacenamiento Dinamico: " + almacenamientoDisponible + "\n");
